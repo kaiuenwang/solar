@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #050608;
+        }
+        canvas {
+            border: 1px solid #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="solarSystemCanvas" width="600" height="1200"></canvas>
+    <script>
+        const canvas = document.getElementById('solarSystemCanvas');
+        const ctx = canvas.getContext('2d');
+
+        const images = {
+            sun: new Image(),
+            mercury: new Image(),
+            venus: new Image(),
+            earth: new Image(),
+            moon: new Image(),
+            mars: new Image(),
+            jupiter: new Image(),
+            saturn: new Image(),
+            uranus: new Image(),
+            neptune: new Image()
+        };
+
+        images.sun.src = 'https://img.alicdn.com/imgextra/i1/O1CN01oVLbLx22VlN34KDQs_!!6000000007126-2-tps-800-800.png';
+        images.mercury.src = 'https://img.alicdn.com/imgextra/i2/O1CN01UjgqIB1SrRxQfrflh_!!6000000002300-2-tps-800-800.png';
+        images.venus.src = 'https://img.alicdn.com/imgextra/i3/O1CN01JGEgLU1dfxnVvp91R_!!6000000003764-2-tps-800-800.png';
+        images.earth.src = 'https://img.alicdn.com/imgextra/i4/O1CN01R6wlzD1IhhMlBcGLg_!!6000000000925-2-tps-800-800.png';
+        images.moon.src = 'https://img.alicdn.com/imgextra/i4/O1CN01Ad5SeB20tv1nfRoA2_!!6000000006908-2-tps-800-800.png';
+        images.mars.src = 'https://img.alicdn.com/imgextra/i1/O1CN01OlZAk81OVEHJ0pazq_!!6000000001710-2-tps-800-800.png';
+        images.jupiter.src = 'https://img.alicdn.com/imgextra/i2/O1CN01MA3Mk51bAhWxWxHim_!!6000000003425-2-tps-800-800.png';
+        images.saturn.src = 'https://img.alicdn.com/imgextra/i2/O1CN01NG2FjS1XDDEofNNhg_!!6000000002889-2-tps-800-800.png';
+        images.uranus.src = 'https://img.alicdn.com/imgextra/i1/O1CN01wnxTX51xIPkTHqPBr_!!6000000006420-2-tps-800-800.png';
+        images.neptune.src = 'https://img.alicdn.com/imgextra/i1/O1CN01LTf0rT25zwJWsIDkD_!!6000000007598-2-tps-800-800.png';
+
+        const stars = [];
+        for (let i = 0; i < 200; i++) {
+            stars.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 0.5 + 0.5,
+                opacity: Math.random() * 0.5 + 0.5
+            });
+        }
+
+        let angle = 0;
+
+        function drawBackground() {
+            const gradient = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, 0, canvas.width / 2, canvas.height / 2, canvas.width);
+            gradient.addColorStop(0, '#1C2837');
+            gradient.addColorStop(1, '#050608');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            stars.forEach(star => {
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+                ctx.fill();
+            });
+        }
+
+        function drawPlanet(image, radius, scale, speed) {
+            const x = canvas.width / 2 + radius * Math.cos(angle * speed);
+            const y = canvas.height / 2 + radius * Math.sin(angle * speed);
+            ctx.drawImage(image, x - image.width * scale / 2, y - image.height * scale / 2, image.width * scale, image.height * scale);
+            return { x, y };
+        }
+
+        function drawOrbit(radius) {
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.setLineDash([5, 5]);
+            ctx.lineWidth = 1;
+            ctx.ellipse(canvas.width / 2, canvas.height / 2, radius, radius, 0, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+
+        function drawSolarSystem() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawBackground();
+
+            drawOrbit(60);
+            drawOrbit(90);
+            drawOrbit(120);
+            drawOrbit(150);
+            drawOrbit(180);
+            drawOrbit(210);
+            drawOrbit(240);
+            drawOrbit(270);
+
+            drawPlanet(images.sun, 0, 0.075, 0);
+
+            drawPlanet(images.mercury, 60, 0.00625, 4);
+            drawPlanet(images.venus, 90, 0.01, 3);
+            const earthPos = drawPlanet(images.earth, 120, 0.0125, 2);
+            const moonPos = drawPlanet(images.moon, 120 + 10, 0.005, 5);
+            ctx.beginPath();
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+            ctx.setLineDash([2, 2]);
+            ctx.lineWidth = 0.5;
+            ctx.arc(earthPos.x, earthPos.y, 10, 0, Math.PI * 2);
+            ctx.stroke();
+
+            drawPlanet(images.mars, 150, 0.00875, 1.5);
+            drawPlanet(images.jupiter, 180, 0.015, 1);
+            drawPlanet(images.saturn, 210, 0.03, 0.8);
+            drawPlanet(images.uranus, 240, 0.01125, 0.5);
+            drawPlanet(images.neptune, 270, 0.01, 0.4);
+
+            angle += 0.01;
+
+            requestAnimationFrame(drawSolarSystem);
+        }
+
+        Object.values(images).forEach(img => img.onload = () => {
+            if (Object.values(images).every(i => i.complete)) {
+                drawSolarSystem();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
